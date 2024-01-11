@@ -1,29 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Button, TextField, Typography, Box, Paper } from "@mui/material";
 
-const GetEventById = () => {
-  const [event, setEvent] = useState(null);
-  const [editableEvent, setEditableEvent] = useState(null);
+const EditEventForm = ({ editedEvent, onClose }) => {
+  const [editableEvent, setEditableEvent] = useState(editedEvent);
   const [eventImage, setEventImage] = useState(null);
   const [eventPoster, setEventPoster] = useState(null);
 
-  const { id } = useParams();
-  const navigate = useNavigate();
-
   useEffect(() => {
-    const fetchEventById = async () => {
-      try {
-        const response = await axios.get(`http://localhost:3000/events/${id}`);
-        setEvent(response.data);
-        setEditableEvent(response.data);
-      } catch (error) {
-        console.error('Error fetching event by ID:', error);
-      }
-    };
-
-    fetchEventById();
-  }, [id]);
+    setEditableEvent(editedEvent);
+  }, [editedEvent]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -36,88 +22,142 @@ const GetEventById = () => {
   const handleImageChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      if (e.target.name === 'eventImage') {
+      if (e.target.name === "eventImage") {
         setEventImage(file);
-      } else if (e.target.name === 'eventPoster') {
+      } else if (e.target.name === "eventPoster") {
         setEventPoster(file);
       }
     }
   };
 
- const handleUpdate = async () => {
-  try {
-    const formData = new FormData();
+  const handleUpdate = async () => {
+    try {
+      const formData = new FormData();
 
-    for (const key in editableEvent) {
-      formData.append(key, editableEvent[key]);
+      for (const key in editableEvent) {
+        formData.append(key, editableEvent[key]);
+      }
+
+      if (eventImage) {
+        formData.append("eventImage", eventImage);
+      }
+
+      if (eventPoster) {
+        formData.append("eventPoster", eventPoster);
+      }
+
+      await axios.put(
+        `http://localhost:3000/update/${editedEvent._id}`,
+        formData
+      );
+      window.location.reload();
+      onClose();
+    } catch (error) {
+      console.error("Error updating event:", error);
     }
+  };
 
-    formData.append('eventImage', eventImage);
-    formData.append('eventPoster', eventPoster);
-
-    await axios.put(`http://localhost:3000/update/${id}`, formData);
-
-    setEvent(editableEvent);
-
-    navigate('/user-dashboard');
-  } catch (error) {
-    console.error('Error updating event:', error);
+  if (!editableEvent) {
+    return <div>Loading...</div>;
   }
-};
-
-
-
 
   return (
-    <div>
-      <h1>Event Details</h1>
-      {event ? (
-        <div>
-          <h2>Current Event Details</h2>
-          <ul>
-            {Object.keys(event).map((key) => (
-              <li key={key}>
-                {key.charAt(0).toUpperCase() + key.slice(1)}: {event[key]}
-              </li>
-            ))}
-          </ul>
-
-          {/* Editable form */}
-          <h2>Edit Event</h2>
-          <form encType="multipart/form-data">
-            {Object.keys(editableEvent || {}).map((key) => (
-              <div key={key}>
-                <label htmlFor={key}>{key.charAt(0).toUpperCase() + key.slice(1)}:</label>
-                <input
-                  type="text"
-                  id={key}
-                  name={key}
-                  value={editableEvent[key] || ''}
-                  onChange={handleInputChange}
-                />
-              </div>
-            ))}
-
-            <div>
-              <label htmlFor="eventImage">Event Image:</label>
-              <input type="file" id="eventImage" name="eventImage" onChange={handleImageChange} />
-            </div>
-
-            <div>
-              <label htmlFor="eventPoster">Event Poster:</label>
-              <input type="file" id="eventPoster" name="eventPoster" onChange={handleImageChange} />
-            </div>
-
-            <button type="button" onClick={handleUpdate}>
-              Update Event
-            </button>
-          </form>
-        </div>
-      ) : (
-        <p>Loading...</p>
-      )}
-    </div>
+    <form>
+      <TextField
+        id="title"
+        label="Title"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        name="title"
+        value={editableEvent.title}
+        onChange={handleInputChange}
+      />
+      <TextField
+        id="description"
+        label="Description"
+        variant="outlined"
+        fullWidth
+        multiline
+        rows={4}
+        margin="normal"
+        name="description"
+        value={editableEvent.description}
+        onChange={handleInputChange}
+      />
+      <TextField
+        id="email"
+        label="Email"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        name="email"
+        value={editableEvent.email}
+        onChange={handleInputChange}
+      />
+      <TextField
+        id="address"
+        label="Address"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        name="address"
+        value={editableEvent.address}
+        onChange={handleInputChange}
+      />
+      <TextField
+        id="city"
+        label="City"
+        variant="outlined"
+        fullWidth
+        margin="normal"
+        name="city"
+        value={editableEvent.city}
+        onChange={handleInputChange}
+      />
+      <TextField
+        id="organizerDetails"
+        label="Organizer Details"
+        variant="outlined"
+        fullWidth
+        multiline
+        rows={4}
+        margin="normal"
+        name="organizerDetails"
+        value={editableEvent.organizerDetails}
+        onChange={handleInputChange}
+      />
+      <Box mt={2}>
+        <Typography variant="subtitle1">Current Event Image:</Typography>
+        {editableEvent.eventImage && (
+          <Paper>
+            <img
+              src={`http://localhost:3000/uploads/${editableEvent.eventImage}`}
+              alt="Event Image"
+              style={{ maxWidth: "100%", maxHeight: "200px" }}
+            />
+          </Paper>
+        )}
+      </Box>
+      <input type="file" name="eventImage" onChange={handleImageChange} />
+      <Box mt={2}>
+        <Typography variant="subtitle1">Current Event Poster:</Typography>
+        {editableEvent.eventPoster && (
+          <Paper>
+            <img
+              src={`http://localhost:3000/uploads/${editableEvent.eventPoster}`}
+              alt="Event Poster"
+              style={{ maxWidth: "100%", maxHeight: "200px" }}
+            />
+          </Paper>
+        )}
+      </Box>
+      <input type="file" name="eventPoster" onChange={handleImageChange} />
+      <Button variant="contained" color="primary" onClick={handleUpdate}>
+        Update Event
+      </Button>
+    </form>
   );
 };
 
-export default GetEventById;
+export default EditEventForm;

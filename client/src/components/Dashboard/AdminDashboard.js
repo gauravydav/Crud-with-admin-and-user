@@ -15,7 +15,6 @@ import {
   CardContent,
   InputAdornment,
   IconButton,
-  Box,
   TablePagination,
   Drawer,
 } from "@mui/material";
@@ -26,6 +25,8 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Header from "../Header/HeaderDashboard";
 import CreateEventForm from "./AddEvent";
+import CloseIcon from "@mui/icons-material/Close";
+import EditEventDrawer from "./EditEventDrawer";
 
 function AdminDashboard() {
   const [events, setEvents] = useState([]);
@@ -36,6 +37,10 @@ function AdminDashboard() {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [viewEvent, setViewEvent] = useState(null);
+  const [isViewDrawerOpen, setIsViewDrawerOpen] = useState(false);
+  const [editedEvent, setEditedEvent] = useState(null);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -75,11 +80,9 @@ function AdminDashboard() {
   };
 
   const handleEditEvent = (eventId) => {
-    console.log(`Edit event with ID: ${eventId}`);
-  };
-
-  const handleViewEvent = (eventId) => {
-    console.log(`View event with ID: ${eventId}`);
+    const eventToEdit = filteredEvents.find((event) => event._id === eventId);
+    setEditedEvent(eventToEdit);
+    setIsEditDrawerOpen(true);
   };
 
   const handleDeleteEvent = async (eventId) => {
@@ -114,6 +117,15 @@ function AdminDashboard() {
 
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
+  };
+  const handleViewEvent = (eventId) => {
+    const selectedEvent = events.find((event) => event._id === eventId);
+    setViewEvent(selectedEvent);
+    setIsViewDrawerOpen(true);
+  };
+
+  const handleViewDrawerClose = () => {
+    setIsViewDrawerOpen(false);
   };
 
   return (
@@ -186,7 +198,7 @@ function AdminDashboard() {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleDrawerOpen} 
+                onClick={handleDrawerOpen}
                 style={{ color: "white", textDecoration: "none" }}
               >
                 <AddIcon style={{ marginRight: "8px" }} />
@@ -299,6 +311,91 @@ function AdminDashboard() {
       ) : (
         <Typography variant="body1">No events available</Typography>
       )}
+
+      <Drawer
+        anchor="right"
+        open={isViewDrawerOpen}
+        onClose={handleViewDrawerClose}
+      >
+        <div style={{ width: "300px", padding: "16px" }}>
+          <Typography
+            variant="h6"
+            style={{ marginBottom: "24px", fontSize: "1.2rem" }}
+          >
+            View Event
+          </Typography>
+          {viewEvent && (
+            <div>
+              <Typography
+                variant="subtitle1"
+                style={{ marginBottom: "8px" }}
+              >{`Title: ${viewEvent.title}`}</Typography>
+              <Typography
+                variant="subtitle1"
+                style={{ marginBottom: "8px" }}
+              >{`Description: ${viewEvent.description}`}</Typography>
+              <Typography
+                variant="subtitle1"
+                style={{ marginBottom: "8px" }}
+              >{`Email: ${viewEvent.email}`}</Typography>
+              <Typography
+                variant="subtitle1"
+                style={{ marginBottom: "8px" }}
+              >{`Address: ${viewEvent.address}`}</Typography>
+              <Typography
+                variant="subtitle1"
+                style={{ marginBottom: "8px" }}
+              >{`City: ${viewEvent.city}`}</Typography>
+              <Typography
+                variant="subtitle1"
+                style={{ marginBottom: "8px" }}
+              >{`Organizer: ${viewEvent.organizerDetails}`}</Typography>
+              {viewEvent.eventPoster && (
+                <div style={{ marginBottom: "16px" }}>
+                  <Typography
+                    variant="subtitle1"
+                    style={{ marginBottom: "8px" }}
+                  >
+                    Event Banner:
+                  </Typography>
+                  <img
+                    src={`http://localhost:3000/uploads/${viewEvent.eventPoster}`}
+                    alt="Event Banner"
+                    style={{ maxWidth: "100%", maxHeight: "200px" }}
+                  />
+                </div>
+              )}
+              {viewEvent.eventImage && (
+                <div style={{ marginBottom: "16px" }}>
+                  <Typography
+                    variant="subtitle1"
+                    style={{ marginBottom: "8px" }}
+                  >
+                    Event Image:
+                  </Typography>
+                  <img
+                    src={`http://localhost:3000/uploads/${viewEvent.eventImage}`}
+                    alt="Event Image"
+                    style={{ maxWidth: "100%", maxHeight: "200px" }}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+          <IconButton
+            color="primary"
+            onClick={handleViewDrawerClose}
+            style={{ position: "absolute", top: "8px", right: "8px" }}
+          >
+            <CloseIcon />
+          </IconButton>
+        </div>
+      </Drawer>
+      <EditEventDrawer
+        isOpen={isEditDrawerOpen}
+        onClose={() => setIsEditDrawerOpen(false)}
+        editedEvent={editedEvent}
+      />
     </div>
   );
 }

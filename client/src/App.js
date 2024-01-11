@@ -23,7 +23,7 @@ const App = () => {
         <Route path="/createNew" element={<NewPasswordPage/>} />
         <Route path="/search" element={<EventSearch />} />
         {/* <Route path="/createvent" element={<CreateEventForm />} /> */}
-        <Route path="/edit/:id" element={<EditEventPage/>} />
+        <Route path="/edit-event/:id" element={<EditEventPage/>} />
      
       </Routes>
     </Router>
