@@ -2,7 +2,7 @@ const nodemailer = require("nodemailer");
 const randomstring = require("randomstring");
 const bcrypt = require("bcrypt");
 const User = require("../models/userModel");
-require('dotenv').config();
+require("dotenv").config();
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -77,6 +77,8 @@ exports.verifyOtpAndUpdatePassword = async (req, res) => {
     return res.status(200).json({ message: "Password changed successfully." });
   } catch (error) {
     console.error("Error:", error);
-    return res.status(500).json({ error: "Failed to verify OTP and update password." });
+    return res
+      .status(500)
+      .json({ error: "Failed to verify OTP and update password." });
   }
 };
