@@ -5,6 +5,7 @@ import {
   IconButton,
   InputAdornment,
   Snackbar,
+  Alert,
 } from "@mui/material";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
@@ -23,7 +24,11 @@ const SignUpForm = () => {
   });
 
   const [error, setError] = useState();
-  const [isSnackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState("");
+  const [snackbarSeverity, setSnackbarSeverity] = useState("success"); 
+
+  const [isRotating, setRotating] = useState(false);
 
   const handlePasswordVisibility = () => {
     setSignUpData((prevData) => ({
@@ -49,6 +54,18 @@ const SignUpForm = () => {
 
   const handleSignUpSubmit = async (e) => {
     e.preventDefault();
+    if (
+      !signUpData.userName ||
+      !signUpData.email ||
+      !signUpData.password ||
+      !signUpData.confirmPassword ||
+      !signUpData.role
+    ) {
+      setError("All fields are compulsory. Please fill in all the fields.");
+      setSnackbarSeverity("error");
+      setSnackbarOpen(true);
+      return;
+    }
 
     try {
       const formData = {
@@ -58,8 +75,7 @@ const SignUpForm = () => {
         confirmPassword: signUpData.confirmPassword,
         role: signUpData.role,
       };
-      console.log(formData)
-
+      setRotating(true);
       const response = await axios.post(
         "http://localhost:3000/user/register",
         formData,
@@ -69,29 +85,41 @@ const SignUpForm = () => {
           },
         }
       );
-      console.log(response)
 
-      navigate("/");
-      setSignUpData({
-        userName: "",
-        email: "",
-        password: "",
-        confirmPassword: "",
-        role: "",
-        showPassword: false,
-        showConfirmPassword: false,
-      });
+      setRotating(true);
+      setTimeout(() => {
+        setRotating(false);
+        navigate("/");
+        setSignUpData({
+          userName: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          role: "",
+          showPassword: false,
+          showConfirmPassword: false,
+        });
+        setSnackbarMessage("Successfully signed up. Please sign in.");
+        setSnackbarSeverity("success");
+        setSnackbarOpen(true);
+      }, 3000);
     } catch (error) {
       console.error("Error during signup:", error.message);
- 
+      setError("Signup failed. Please try again.");
+      setSnackbarMessage("Registration unsuccessful. " + error.message);
+      setSnackbarSeverity("error");
       setSnackbarOpen(true);
+
+      setRotating(false);
     }
   };
 
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
-    setError(null);
+    setSnackbarMessage("");
+    setSnackbarSeverity("success");
   };
+
   return (
     <>
       <form onSubmit={handleSignUpSubmit}>
@@ -153,10 +181,10 @@ const SignUpForm = () => {
           }}
         />
         <TextField
-          label="Role"
+          label="Fullname"
           fullWidth
           margin="normal"
-          name="Fullname"
+          name="role"
           value={signUpData.role}
           onChange={handleInputChange}
         />
@@ -171,16 +199,23 @@ const SignUpForm = () => {
             color: "white",
           }}
         >
-          Sign Up
+          {isRotating ? "Signing Up..." : "Sign Up"}
         </Button>
       </form>
 
       <Snackbar
-        open={isSnackbarOpen}
+        open={snackbarOpen}
         autoHideDuration={6000}
         onClose={handleSnackbarClose}
-        message={error}
-      />
+      >
+        <Alert
+          severity={snackbarSeverity}
+          variant="filled"
+          onClose={handleSnackbarClose}
+        >
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
