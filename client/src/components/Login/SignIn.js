@@ -50,7 +50,7 @@ const SignInForm = () => {
       localStorage.setItem("jwtToken");
     } catch (error) {
       console.error('Login failed:', error);
-      alert('Invalid username or password');
+     
     }
   };
 
