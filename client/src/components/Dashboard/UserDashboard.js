@@ -196,7 +196,7 @@ function AdminDashboard() {
           </div>
         </CardContent>
       </Card>
-
+      
       {Array.isArray(filteredEvents) && filteredEvents.length > 0 ? (
         <div>
           <TableContainer component={Paper}>
