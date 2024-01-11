@@ -5,6 +5,10 @@ import UserDashboard from './components/Dashboard/UserDashboard'
 import ForgetPassword from './components/ForgetPage/ForgetPassword'
 import OtpPage from "./components/ForgetPage/OtpPage";
 import NewPasswordPage from "./components/ForgetPage/NewPassword";
+import CreateEventForm from './components/Dashboard/AddEvent';
+import EventSearch from './components/Dashboard/EventSearch';
+import EditEventPage from './components/Dashboard/EditEvent';
+import AdminDashboard from "./components/Dashboard/AdminDashboard";
 
 import "./App.css";
 const App = () => {
@@ -14,8 +18,12 @@ const App = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/otp" element={<OtpPage />} />
         <Route path="/forget-password" element={<ForgetPassword />} />
-        <Route path="/userDashboard" element={<UserDashboard />} />
+        <Route path="/admin-dashboard" element={<AdminDashboard />} />
+        <Route path="/user-dashboard" element={<UserDashboard />} />
         <Route path="/createNew" element={<NewPasswordPage/>} />
+        <Route path="/search" element={<EventSearch />} />
+        {/* <Route path="/createvent" element={<CreateEventForm />} /> */}
+        <Route path="/edit/:id" element={<EditEventPage/>} />
      
       </Routes>
     </Router>
