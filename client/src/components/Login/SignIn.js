@@ -40,9 +40,9 @@ const SignInForm = () => {
 
       const token = response.data.token;
       const decoded = jwtDecode(token);
-
-      console.log(decoded.user.role);
-      if (decoded.user.role === 0) {
+// console.log(decoded)
+//       console.log(decoded.user.role);
+      if (decoded.user.isAdmin ===false) {
         navigate('/user-dashboard');
       } else {
         navigate('/admin-dashboard');
