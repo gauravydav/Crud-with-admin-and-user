@@ -59,6 +59,6 @@ nodemon app.js
 ```
 
 If you want to add then give your mongoDburl and change the isAdmin to true which will make you admin and you can create it  
-For admin login
-email:gauravyadav2024@gmail.com
-password:123456
+##### For admin login
+# email:gauravyadav2024@gmail.com
+# password:123456
